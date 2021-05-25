@@ -206,6 +206,20 @@ class CoordinateConverter(object):
             row[['x_start', 'x_end', 'y_start', 'y_end']].values
         self.queryStatus = True
 
+    def save_query(self, file_path):
+        assert self.queryStatus, AssertionError('Need query before store the boundary info!')
+        num_row, num_col, _ = self.np_bounds.shape
+        save_array = np.zeros([num_row*num_col, 6])
+        arr_counter = 0
+        for i in range(num_row):
+            for j in range(num_col):
+                save_array[arr_counter] = [i+1, j+1] + list(self.np_bounds[i, j])
+                arr_counter +=1
+        save_df = pd.DataFrame(save_array)
+        save_df.columns = ['range', 'column', 'x_start', 'x_end', 'y_start', 'y_end']
+        save_df[['range', 'column']] = save_df[['range', 'column']].astype(int)
+        save_df.to_csv(file_path, index=False, header=True)
+
     def parse_bety_plots(self):
         
         for item in self.plots:
